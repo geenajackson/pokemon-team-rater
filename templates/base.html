@@ -12,6 +12,28 @@
 </head>
 
 <body>
+    <nav class="navbar navbar-expand-lg" style="background-color: #ffcb05">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a href="/" class="navbar-brand">
+                    <img src="/static/images/poke-ball.png" alt="logo">
+                    <span>Pokemon Team Rater</span>
+                </a>
+            </div>
+            <ul class="nav navbar-nav navbar-right">
+                {% if not g.user %}
+                <li><a href="/signup">Sign up</a></li>
+                <li><a href="/login">Log in</a></li>
+                {% else %}
+                <li>
+                    <a href="/users/{{ g.user.id }}">My Account
+                    </a>
+                </li>
+                <li><a href="/logout">Log out</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
     <div class="container">
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}

@@ -59,15 +59,35 @@ def signup():
 
     form = UserSignUpForm()
 
+    if form.validate_on_submit():
+        try:
+            new_user = User.signup(
+                email=form.email.data,
+                username=form.username.data,
+                password=form.password.data
+            )
+            db.session.commit()
+        except IntegrityError:
+            flash("Username/Email already taken.", "danger")
+            return render_template("/user/signup.html", form=form)
+        
+        do_login(new_user)
+        flash("Created your account!", "success")
+
+        return redirect("/")
+    
+    else:
+        return render_template("/user/signup.html", form=form)
+
 ##################################################################################
 # Homepage and redirect to signup.
 
 @app.route("/")
 def homepage():
-    """Shows homepage. Redirects user to signup if not logged in."""
+    """Shows homepage if logged in. Renders signup/login choices if not."""
 
     if g.user:
-        return render_template("home.html")
+        return render_template("home.html", user=g.user)
     
     else:
-        return redirect("/signup")
+        return render_template("home-anon.html")

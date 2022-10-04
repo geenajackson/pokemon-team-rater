@@ -79,6 +79,11 @@ def signup():
     else:
         return render_template("/user/signup.html", form=form)
 
+@app.route("/logout")
+def logout():
+    """Logs out a user."""
+    do_logout()
+    return redirect("/")
 ##################################################################################
 # Homepage and redirect to signup.
 

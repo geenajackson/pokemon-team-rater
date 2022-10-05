@@ -5,8 +5,8 @@ from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import or_
 
-from forms import UserSignUpForm, LoginForm
-from models import db, connect_db, User
+from forms import UserSignUpForm, LoginForm, TeamForm
+from models import db, connect_db, User, Team
 
 CURR_USER_KEY = "curr_user"
 
@@ -110,7 +110,53 @@ def homepage():
     """Shows homepage if logged in. Renders signup/login choices if not."""
 
     if g.user:
-        return render_template("home.html", user=g.user)
+        teams = (Team.query.limit(100).all())
+        return render_template("home.html", user=g.user, teams=teams)
     
     else:
         return render_template("home-anon.html")
+
+##################################################################################
+# Team CRUD routes.
+
+@app.route("/teams/new", methods=["GET", "POST"])
+def new_team():
+    """Creates a new team of Pokemon."""
+
+    if not g.user:
+        flash("Log in to view this page!", "warning")
+        return redirect("/")
+
+    form = TeamForm()
+
+    if form.validate_on_submit():
+        team = Team(
+            name = form.name.data,
+            details = form.details.data,
+            user_id = g.user.id
+        )
+        
+        db.session.add(team)
+        db.session.commit()
+        flash("New team created!", "success")
+        return redirect(f"/teams/{g.user.id}")
+    
+    return render_template("/team/new-team.html", form=form)
+
+@app.route("/teams/<int:user_id>")
+def show_teams(user_id):
+    """Shows teams for a specific user."""
+    
+    if not g.user:
+        flash("Log in to view this page!", "warning")
+        return redirect("/")
+
+    user = User.query.get_or_404(user_id)
+
+    teams = (Team
+            .query
+            .filter(Team.user_id == user_id)
+            .order_by(Team.name.desc())
+            .all())
+
+    return render_template("/team/show.html", user=user, teams=teams)

@@ -101,7 +101,7 @@ class Comment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     team_id = db.Column(db.Integer, db.ForeignKey("teams.id", ondelete="cascade"))
     comment = db.Column(db.Text, nullable=False)
-    commenter_id = db.Column(db.Text, db.ForeignKey("users.id", ondelete="cascade"))
+    commenter_id = db.Column(db.Integer, db.ForeignKey("users.id", ondelete="cascade"))
 
 class Rating(db.Model):
     """A rating on a team."""
@@ -109,7 +109,7 @@ class Rating(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     team_id = db.Column(db.Integer, db.ForeignKey("teams.id", ondelete="cascade"))
     rating = db.Column(db.Integer, nullable=False)
-    rater_id = db.Column(db.Text, db.ForeignKey("users.id", ondelete="cascade"))
+    rater_id = db.Column(db.Integer, db.ForeignKey("users.id", ondelete="cascade"))
 
 def connect_db(app):
     """Connect this database to provided Flask app."""

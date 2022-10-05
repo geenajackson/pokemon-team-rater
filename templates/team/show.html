@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}{{user.username}}'s Teams{% endblock %}
+
+{% block content %}
+
+<div class="col-sm-6">
+    <p>hello</p>
+    <ul class="list-group">
+
+        {% for team in teams %}
+
+        <li class="list-group-item">
+            <a href="/teams/{{ team.id }}" class="message-link">
+                <div class="message-area">
+                    <a href="/teams/{{ user.id }}">{{ user.username }}</a>
+                    <p>{{ team.name }}</p>
+                    <p>{{ team.details }}</p>
+                </div>
+        </li>
+
+        {% endfor %}
+
+    </ul>
+</div>
+
+{% endblock %}

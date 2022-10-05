@@ -13,10 +13,6 @@ os.environ['DATABASE_URL'] = "postgresql:///teamrater-test"
 
 from app import app
 
-# Create our tables (we do this here, so we only create the tables
-# once for all tests --- in each test, we'll delete the data
-# and create fresh new clean test data
-
 db.create_all()
 
 class UserTestCase(TestCase):
@@ -64,3 +60,28 @@ class UserTestCase(TestCase):
         db.session.commit()
 
         self.assertEqual(u.username, "testuser")
+    
+    def test_signup(self):
+        "Test for signup class method."
+
+        u = User.signup(
+            email="test@test.com",
+            username="testuser",
+            password="password"
+        )
+
+        db.session.add(u)
+        db.session.commit()
+
+        #hashed passwords begin with $2b$
+        self.assertTrue(u.password.startswith("$2b$"))
+        self.assertTrue(u.username, "testuser")
+
+    # def test_authenticate(self):
+    #     """Test for authenticate class method."""
+
+    #     test_user = User.authenticate(self.user1.username, "password1")
+    #     bad_user = User.authenticate(self.user2.username, "badpassword")
+
+    #     self.assertEqual(test_user.id, self.user1.id)
+    #     self.assertFalse(bad_user)

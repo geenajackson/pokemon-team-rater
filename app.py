@@ -79,6 +79,24 @@ def signup():
     else:
         return render_template("/user/signup.html", form=form)
 
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    """Logs in a user."""
+
+    form = LoginForm()
+
+    if form.validate_on_submit():
+        user = User.authenticate(form.username.data, form.password.data)
+        
+        if user:
+            do_login(user)
+            flash(f"Welcome, {user.username}!", "success")
+            return redirect("/")
+        
+        flash("Invalid credentials.", "danger")
+    
+    return render_template("/user/login.html", form=form)
+
 @app.route("/logout")
 def logout():
     """Logs out a user."""

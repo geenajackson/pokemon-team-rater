@@ -17,6 +17,8 @@ class User(db.Model):
     email = db.Column(db.Text, nullable=False, unique=True)
     username = db.Column(db.Text, nullable=False, unique=True)
     password = db.Column(db.Text, nullable=False)
+    
+    teams = db.relationship("Team")
 
     @classmethod
     def signup(cls, email, username, password):
@@ -48,8 +50,11 @@ class Team(db.Model):
     __tablename__ = "teams"
 
     id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.Text, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id", ondelete="cascade"))
     details = db.Column(db.Text)
+
+    creator = db.relationship("User")
 
 class Pokemon(db.Model):
     """Information about a specific Pokemon."""

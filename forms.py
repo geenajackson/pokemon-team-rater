@@ -15,6 +15,12 @@ class LoginForm(FlaskForm):
     username = StringField("Username", validators=[DataRequired()])
     password = PasswordField("Password", validators=[Length(min=8)])
 
+class TeamForm(FlaskForm):
+    """Form for creating a new team."""
+
+    name = StringField("Name of Team:", validators=[DataRequired()])
+    details = TextAreaField("About your team:", default="N/A")
+
 class CommentForm(FlaskForm):
     """Form for adding a comment."""
 

@@ -22,7 +22,7 @@ class User(db.Model):
     def signup(cls, email, username, password):
         """Signs up a user and hashes password."""
 
-        hashed_pwd = bcrypt.generate_password_hash(password).decode('UTF-8')
+        hashed_pwd = bcrypt.generate_password_hash(password).decode('utf-8')
 
         new_user = User(email=email, username=username, password=hashed_pwd)
 

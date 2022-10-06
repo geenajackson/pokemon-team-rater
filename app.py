@@ -160,3 +160,12 @@ def show_teams(user_id):
             .all())
 
     return render_template("/team/show.html", user=user, teams=teams)
+
+##################################################################################
+"""Routes related to Pokemon."""
+
+@app.route("/pokemon/search")
+def search_pokemon():
+    """Display a search bar for adding Pokemon to a team."""
+    
+    return render_template("/pokemon/search.html")

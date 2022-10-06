@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}Search for Pokemon{% endblock %}
+
+{% block content %}
+
+<h1>Look up a Pokemon to add to your team!</h1>
+<p>Don't know where to start? Try searching for "Pikachu" or "Charizard"!</p>
+
+<form>
+    <input id="pokemon-search" type="text" placeholder="Search...">
+    <button type="submit"><i class="fa-solid fa-magnifying-glass"></i></button>
+</form>
+
+<div id="pokemon-display">
+
+</div>
+
+{% endblock %}

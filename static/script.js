@@ -39,8 +39,7 @@ async function getAndShowPokemon(term) {
     const pokemon = await getPokemon(term)
     const $pokemon = showPokemonMarkup(pokemon)
     if ($pokemon != undefined) {
-        $pokemonDisplay.append($pokemon[0])
-        console.log($pokemon[0])
+        $pokemonDisplay.prepend($pokemon[0])
         $pokemonDisplay.show()
     }
 }
@@ -48,6 +47,5 @@ async function getAndShowPokemon(term) {
 $pokemonSearch.on("submit", function (evt) {
     evt.preventDefault();
     const term = $term.val().toLowerCase();
-    console.log("term:", term);
     getAndShowPokemon(term);
 })

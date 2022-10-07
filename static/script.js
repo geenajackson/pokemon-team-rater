@@ -23,8 +23,10 @@ function showPokemonMarkup(pokemon) {
         return $(`<p>Pokemon not found!</p>`)
     }
     else return $(`
-    <p><img src="${pokemon.sprites.front_default}">Name: ${pokemon.name}</p>
-    
+    <div>
+    <input type="radio" id="${pokemon.name}" name="${pokemon.name}" value="${pokemon.name}">
+    <label for="${pokemon.name}"><img src="${pokemon.sprites.front_default}">Name: ${pokemon.name}</label>
+    </div>
     `)
 }
 

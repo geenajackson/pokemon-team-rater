@@ -161,11 +161,18 @@ def show_teams(user_id):
 
     return render_template("/team/show.html", user=user, teams=teams)
 
-##################################################################################
-"""Routes related to Pokemon."""
-
-@app.route("/pokemon/search")
-def search_pokemon():
+@app.route("/teams/<int:team_id>/search")
+def search_pokemon(team_id):
     """Display a search bar for adding Pokemon to a team."""
-    
-    return render_template("/pokemon/search.html")
+
+    if not g.user:
+        flash("Log in to view this page!", "warning")
+        return redirect("/")
+
+    team = Team.query.get_or_404(team_id)
+
+    if team.user_id != g.user.id:
+        flash("Access unauthorized.", "warning")
+        return redirect("/")
+
+    return render_template("/pokemon/search.html", team=team)

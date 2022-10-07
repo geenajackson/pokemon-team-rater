@@ -1,12 +1,12 @@
 import os
+import requests
 
-from flask import Flask, render_template, request, flash, redirect, session, g
+from flask import Flask, jsonify, render_template, request, flash, redirect, session, g
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy import or_
 
 from forms import UserSignUpForm, LoginForm, TeamForm
-from models import db, connect_db, User, Team
+from models import db, connect_db, User, Team, Pokemon
 
 CURR_USER_KEY = "curr_user"
 
@@ -177,6 +177,8 @@ def search_pokemon(team_id):
 
     return render_template("/pokemon/search.html", team=team)
 
+
+
 @app.route("/teams/<int:team_id>/add", methods=["POST"])
 def add_pokemon(team_id):
     """Adds selected Pokemon to the team."""
@@ -192,6 +194,29 @@ def add_pokemon(team_id):
         return redirect("/")
     
     pokemon = request.form["pokemon"]
-    raise
+    
+    json_pokemon = requests.get(f"https://pokeapi.co/api/v2/pokemon/{pokemon}").json()
+
+    try:
+        new_pokemon = Pokemon(
+            name=json_pokemon["name"],
+            image=json_pokemon["sprites"]["front_default"],
+            type_1=json_pokemon["types"][0]["type"]["name"],
+            type_2=json_pokemon["types"][1]["type"]["name"]
+        )
+
+    except IndexError:
+        new_pokemon = Pokemon(
+            name=json_pokemon["name"],
+            image=json_pokemon["sprites"]["front_default"],
+            type_1=json_pokemon["types"][0]["type"]["name"],
+        )       
+
+
+
+    db.session.add(new_pokemon)
+    db.session.commit()
+
+    flash(f"Your new pokemon is: {new_pokemon.name}", "success")
 
     return redirect("/")

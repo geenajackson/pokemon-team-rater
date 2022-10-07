@@ -22,20 +22,27 @@ function showPokemonMarkup(pokemon) {
     if (pokemon == undefined) {
         return $(`<p>Pokemon not found!</p>`)
     }
-    else return $(`
+    else if ($pokemonDisplay.children().text().toLowerCase().includes(pokemon.name.toLowerCase()) == false) {
+        return $(`
     <div>
-    <input type="radio" id="${pokemon.name}" name="${pokemon.name}" value="${pokemon.name}">
-    <label for="${pokemon.name}"><img src="${pokemon.sprites.front_default}">Name: ${pokemon.name}</label>
+    <input type="radio" id="${pokemon.name}" name="pokemon" value="${pokemon.name}">
+    <label for="${pokemon.name}"><img src="${pokemon.sprites.front_default}">${pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1)}</label>
     </div>
     `)
+    }
+    else {
+        return undefined;
+    }
 }
 
 async function getAndShowPokemon(term) {
     const pokemon = await getPokemon(term)
     const $pokemon = showPokemonMarkup(pokemon)
-    $pokemonDisplay.append($pokemon[0])
-    console.log($pokemon[0])
-    $pokemonDisplay.show()
+    if ($pokemon != undefined) {
+        $pokemonDisplay.append($pokemon[0])
+        console.log($pokemon[0])
+        $pokemonDisplay.show()
+    }
 }
 
 $pokemonSearch.on("submit", function (evt) {

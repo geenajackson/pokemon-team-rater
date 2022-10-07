@@ -4,17 +4,22 @@
 
 {% block content %}
 
-<h1>Look up a Pokemon to add to your team!</h1>
-<p>Don't know where to start? Try searching for "Pikachu" or "Charizard"!</p>
+<div class="container">
+    <h1 class="display-3">Look up a Pokemon to add to your team!</h1>
+    <p class="lead">Don't know where to start? Try searching for "Pikachu" or "Charizard"!</p>
 
-<form id="pokemon-search">
-    <input id="term" type="text" placeholder="Search...">
-    <button type="submit"><i class="fa-solid fa-magnifying-glass"></i></button>
-</form>
+    <form id="pokemon-search">
+        <input id="term" type="text" placeholder="Search...">
+        <button type="submit"><i class="fa-solid fa-magnifying-glass"></i></button>
+    </form>
 
-<div id="pokemon-display">
-    <h2>Your Pokemon:</h2>
+    <div id="pokemon-display">
+        <h2>Your Pokemon:</h2>
+        <form>
 
+        </form>
+
+    </div>
 </div>
 
 {% endblock %}

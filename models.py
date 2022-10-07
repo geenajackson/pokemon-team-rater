@@ -54,7 +54,6 @@ class Team(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("users.id", ondelete="cascade"))
     details = db.Column(db.Text)
 
-    creator = db.relationship("User")
 
 class Pokemon(db.Model):
     """Information about a specific Pokemon."""
@@ -65,7 +64,7 @@ class Pokemon(db.Model):
     name = db.Column(db.Text, nullable=False, unique=True)
     image = db.Column(db.Text, default="/static/images/poke-ball.png")
     type_1 = db.Column(db.Text, nullable=False)
-    type_2 = db.Column(db.Text)
+    type_2 = db.Column(db.Text, default=None)
 
 class Move(db.Model):
     """Information about a Pokemon Move."""

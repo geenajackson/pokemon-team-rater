@@ -176,3 +176,22 @@ def search_pokemon(team_id):
         return redirect("/")
 
     return render_template("/pokemon/search.html", team=team)
+
+@app.route("/teams/<int:team_id>/add", methods=["POST"])
+def add_pokemon(team_id):
+    """Adds selected Pokemon to the team."""
+
+    if not g.user:
+        flash("Log in to view this page!", "warning")
+        return redirect("/")
+
+    team = Team.query.get_or_404(team_id)
+
+    if team.user_id != g.user.id:
+        flash("Access unauthorized.", "warning")
+        return redirect("/")
+    
+    pokemon = request.form["pokemon"]
+    raise
+
+    return redirect("/")

@@ -27,6 +27,10 @@
 
         <button class="btn btn-primary" type="submit">Update</button>
     </form>
+    <a href="/teams/{{team.id}}/search" class="btn btn-success">Add Pokemon!</a>
+    <form action="/teams/{{team.id}}/delete" method="POST">
+        <button class="btn btn-danger"><i class="fa-regular fa-trash-can"></i> Delete</button>
+        <a href="/teams/{{team.id}}/show" class="btn btn-secondary">Cancel</a>
 </div>
 
 {% endblock %}

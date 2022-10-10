@@ -19,7 +19,7 @@
                 </div>
         </li>
     </ul>
-    {% if team.user_id == user.id %}
+    {% if team.user_id == g.user.id %}
     <a href="/teams/{{team.id}}/edit" class="btn btn-secondary">Edit</a>
     {% endif %}
 </div>

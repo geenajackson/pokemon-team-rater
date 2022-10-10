@@ -54,6 +54,11 @@ class Team(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("users.id", ondelete="cascade"))
     details = db.Column(db.Text)
 
+    members = db.relationship(
+    'Pokemon',
+    secondary="team_members"
+    )
+
 
 class Pokemon(db.Model):
     """Information about a specific Pokemon."""

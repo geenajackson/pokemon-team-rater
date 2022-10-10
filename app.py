@@ -130,7 +130,7 @@ def homepage():
 
     if g.user:
         teams = (Team.query.order_by(Team.id.desc()).limit(100).all())
-        return render_template("home.html", user=g.user, teams=teams)
+        return render_template("home.html", teams=teams)
     
     else:
         return render_template("home-anon.html")
@@ -205,7 +205,7 @@ def add_pokemon(team_id):
 
         flash(f"Your new pokemon is: {add_pokemon.name}", "success")
 
-        return redirect("/")
+        return redirect(f"/teams/{team.id}/show")
 
 
     else: 

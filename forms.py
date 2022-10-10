@@ -18,10 +18,19 @@ class LoginForm(FlaskForm):
 class TeamForm(FlaskForm):
     """Form for creating a new team."""
 
-    name = StringField("Name of Team:", validators=[DataRequired()])
+    name = StringField("Name of Team:", validators=[DataRequired(), Length(max=100)])
     details = TextAreaField("About your team:", default="N/A")
 
 class CommentForm(FlaskForm):
     """Form for adding a comment."""
 
     comment = TextAreaField("Comment", validators=[DataRequired()])
+
+def edit_team_form(team):
+    """Function for editing a team"""
+    class EditTeamForm(FlaskForm):
+        """Form for editing a team."""
+        name = StringField("Team Name", default=team.name, validators=[DataRequired(), Length(max=100)])
+        details = TextAreaField("Details", default=team.details, validators=[DataRequired()])
+    
+    return EditTeamForm()

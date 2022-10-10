@@ -25,7 +25,7 @@ app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', "super effective secret"
 toolbar = DebugToolbarExtension(app)
 
 ##################################################################################
-# User signup/login/logout routes
+# User related routes
 
 @app.before_request
 def add_user_to_g():
@@ -97,6 +97,24 @@ def login():
     
     return render_template("/user/login.html", form=form)
 
+@app.route("/users/<int:user_id>")
+def show_user_teams(user_id):
+    """Shows teams for a specific user."""
+    
+    if not g.user:
+        flash("Log in to view this page!", "warning")
+        return redirect("/")
+
+    user = User.query.get_or_404(user_id)
+
+    teams = (Team
+            .query
+            .filter(Team.user_id == user_id)
+            .order_by(Team.name.desc())
+            .all())
+
+    return render_template("/user/show.html", user=user, teams=teams)
+
 @app.route("/logout")
 def logout():
     """Logs out a user."""
@@ -143,23 +161,6 @@ def new_team():
     
     return render_template("/team/new-team.html", form=form)
 
-@app.route("/teams/<int:user_id>")
-def show_teams(user_id):
-    """Shows teams for a specific user."""
-    
-    if not g.user:
-        flash("Log in to view this page!", "warning")
-        return redirect("/")
-
-    user = User.query.get_or_404(user_id)
-
-    teams = (Team
-            .query
-            .filter(Team.user_id == user_id)
-            .order_by(Team.name.desc())
-            .all())
-
-    return render_template("/team/show.html", user=user, teams=teams)
 
 @app.route("/teams/<int:team_id>/search")
 def search_pokemon(team_id):

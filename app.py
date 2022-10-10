@@ -282,3 +282,23 @@ def edit_team(team_id):
         return redirect(f"/teams/{team.id}/show")
     
     return render_template("/team/edit.html", form=form, team=team)
+
+@app.route("/teams/<int:team_id>/delete", methods=["POST"])
+def delete_team(team_id):
+    """Deletes a team."""
+
+    if not g.user:
+        flash("Log in to view this page!", "warning")
+        return redirect("/")
+
+    team = Team.query.get_or_404(team_id)
+
+    if team.user_id != g.user.id:
+        flash("Access unauthorized.", "warning")
+        return redirect("/")
+
+    db.session.delete(team)
+    db.session.commit()
+    flash("Team deleted.", "danger")
+
+    return redirect(f"/users/{g.user.id}")

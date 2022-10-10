@@ -1,11 +1,12 @@
 import os
+from re import T
 import requests
 
 from flask import Flask, jsonify, render_template, request, flash, redirect, session, g
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
 
-from forms import UserSignUpForm, LoginForm, TeamForm
+from forms import UserSignUpForm, LoginForm, TeamForm, edit_team_form
 from models import db, connect_db, User, Team, Pokemon
 
 CURR_USER_KEY = "curr_user"
@@ -110,7 +111,7 @@ def show_user_teams(user_id):
     teams = (Team
             .query
             .filter(Team.user_id == user_id)
-            .order_by(Team.name.desc())
+            .order_by(Team.id.desc())
             .all())
 
     return render_template("/user/show.html", user=user, teams=teams)
@@ -128,7 +129,7 @@ def homepage():
     """Shows homepage if logged in. Renders signup/login choices if not."""
 
     if g.user:
-        teams = (Team.query.limit(100).all())
+        teams = (Team.query.order_by(Team.id.desc()).limit(100).all())
         return render_template("home.html", user=g.user, teams=teams)
     
     else:
@@ -157,7 +158,7 @@ def new_team():
         db.session.add(team)
         db.session.commit()
         flash("New team created!", "success")
-        return redirect(f"/users/{g.user.id}")
+        return redirect(f"/teams/{team.id}/show")
     
     return render_template("/team/new-team.html", form=form)
 
@@ -233,4 +234,51 @@ def add_pokemon(team_id):
 
         flash(f"Your new pokemon is: {new_pokemon.name}", "success")
 
+        return redirect(f"/teams/{team.id}/show")
+
+@app.route("/teams/<int:team_id>/show")
+def show_team(team_id):
+    """Shows one team's details, comments, and ratings."""
+
+    if not g.user:
+        flash("Log in to view this page!", "warning")
         return redirect("/")
+    
+    team = Team.query.get_or_404(team_id)
+    user = User.query.get(team.user_id)
+
+    return render_template("/team/show.html", team=team, user=user)
+
+    
+
+@app.route("/teams/<int:team_id>/edit", methods=["GET", "POST"])
+def edit_team(team_id):
+    """Edits a team's details and Pokemon."""
+
+    if not g.user:
+        flash("Log in to view this page!", "warning")
+        return redirect("/")
+
+    team = Team.query.get_or_404(team_id)
+
+    if team.user_id != g.user.id:
+        flash("Access unauthorized.", "warning")
+        return redirect("/")
+
+    form = edit_team_form(team)
+
+    if form.validate_on_submit():
+        name = form.name.data
+        details = form.details.data
+
+        team.name = name
+        team.details = details
+        
+        db.session.add(team)
+        db.session.commit()
+
+        flash("Team updated.", "success")
+
+        return redirect(f"/teams/{team.id}/show")
+    
+    return render_template("/team/edit.html", form=form, team=team)

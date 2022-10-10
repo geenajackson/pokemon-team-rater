@@ -5,7 +5,27 @@
 {% block content %}
 
 <div class="container">
-    <a href="/teams/new">Create a new team!</a>
+    <a href="/teams/new">Create a new team!</a><br>
+    <a href="/teams/{{user.id}}">My Teams</a>
+</div>
+<div class="container">
+    <ul class="list-group">
+
+        {% for team in teams %}
+
+        <li class="list-group-item">
+            <a href="/teams/{{ team.id }}">
+                <div class="message-area">
+
+                    <a href="/teams/{{ team.id }}">{{ team.name }}</a>
+                    <p>{{ team.details }}</p>
+                    <span class="text-muted">by <a href="/teams/{{ user.id }}">{{ user.username }}</a></span>
+                </div>
+        </li>
+
+        {% endfor %}
+
+    </ul>
 </div>
 
 {% endblock %}

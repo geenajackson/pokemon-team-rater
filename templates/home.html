@@ -17,7 +17,7 @@
             <a href="/teams/{{ team.id }}">
                 <div class="message-area">
 
-                    <a href="/teams/{{ team.id }}">{{ team.name }}</a>
+                    <a href="/teams/{{ team.id }}/show">{{ team.name }}</a>
                     {% for member in team.members %}
                     <img src="{{member.image}}">{{member.name}}</img>
                     {% endfor %}

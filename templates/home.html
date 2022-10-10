@@ -6,7 +6,7 @@
 
 <div class="container">
     <a href="/teams/new">Create a new team!</a><br>
-    <a href="/teams/{{user.id}}">My Teams</a>
+    <a href="/users/{{user.id}}">My Teams</a>
 </div>
 <div class="container">
     <ul class="list-group">
@@ -18,6 +18,9 @@
                 <div class="message-area">
 
                     <a href="/teams/{{ team.id }}">{{ team.name }}</a>
+                    {% for member in team.members %}
+                    <img src="{{member.image}}">{{member.name}}</img>
+                    {% endfor %}
                     <p>{{ team.details }}</p>
                     <span class="text-muted">by <a href="/users/{{ user.id }}">{{ user.username }}</a></span>
                 </div>

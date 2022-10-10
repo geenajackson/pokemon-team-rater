@@ -18,7 +18,7 @@ class User(db.Model):
     username = db.Column(db.Text, nullable=False, unique=True)
     password = db.Column(db.Text, nullable=False)
     
-    teams = db.relationship("Team")
+    teams = db.relationship("Team", backref="user")
 
     @classmethod
     def signup(cls, email, username, password):

@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}{{team.name}}{% endblock %}
+
+{% block content %}
+
+<div class="container">
+    <ul class="list-group">
+        <li class="list-group-item">
+            <a href="/teams/{{ team.id }}">
+                <div class="message-area">
+
+                    <a href="/teams/{{ team.id }}/show">{{ team.name }}</a>
+                    {% for member in team.members %}
+                    <img src="{{member.image}}">{{member.name}}</img>
+                    {% endfor %}
+                    <p>{{ team.details }}</p>
+                    <span class="text-muted">by <a href="/users/{{ user.id }}">{{ user.username }}</a></span>
+                </div>
+        </li>
+    </ul>
+</div>
+
+{% endblock %}

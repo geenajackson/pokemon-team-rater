@@ -157,7 +157,7 @@ def new_team():
         db.session.add(team)
         db.session.commit()
         flash("New team created!", "success")
-        return redirect(f"/teams/{g.user.id}")
+        return redirect(f"/users/{g.user.id}")
     
     return render_template("/team/new-team.html", form=form)
 
@@ -195,29 +195,42 @@ def add_pokemon(team_id):
         return redirect("/")
     
     pokemon = request.form["pokemon"]
-    
-    json_pokemon = requests.get(f"https://pokeapi.co/api/v2/pokemon/{pokemon}").json()
 
-    try:
-        new_pokemon = Pokemon(
-            name=json_pokemon["name"],
-            image=json_pokemon["sprites"]["front_default"],
-            type_1=json_pokemon["types"][0]["type"]["name"],
-            type_2=json_pokemon["types"][1]["type"]["name"]
-        )
+    add_pokemon = Pokemon.query.filter_by(name=pokemon).first()
 
-    except IndexError:
-        new_pokemon = Pokemon(
-            name=json_pokemon["name"],
-            image=json_pokemon["sprites"]["front_default"],
-            type_1=json_pokemon["types"][0]["type"]["name"],
+    if add_pokemon:
+        team.members.append(add_pokemon)
+        db.session.commit()
+
+        flash(f"Your new pokemon is: {add_pokemon.name}", "success")
+
+        return redirect("/")
+
+
+    else: 
+        json_pokemon = requests.get(f"https://pokeapi.co/api/v2/pokemon/{pokemon}").json()
+
+        try:
+            new_pokemon = Pokemon(
+                name=json_pokemon["name"],
+                image=json_pokemon["sprites"]["front_default"],
+                type_1=json_pokemon["types"][0]["type"]["name"],
+                type_2=json_pokemon["types"][1]["type"]["name"]
+            )
+
+        except IndexError:
+            new_pokemon = Pokemon(
+                name=json_pokemon["name"],
+                image=json_pokemon["sprites"]["front_default"],
+                type_1=json_pokemon["types"][0]["type"]["name"],
         )       
 
 
 
-    db.session.add(new_pokemon)
-    db.session.commit()
+        db.session.add(new_pokemon)
+        team.members.append(new_pokemon)
+        db.session.commit()
 
-    flash(f"Your new pokemon is: {new_pokemon.name}", "success")
+        flash(f"Your new pokemon is: {new_pokemon.name}", "success")
 
-    return redirect("/")
+        return redirect("/")

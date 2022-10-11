@@ -62,6 +62,8 @@ class Team(db.Model):
 
     comments = db.relationship("Comment")
 
+    rating = db.relationship("Rating")
+
 
 class Pokemon(db.Model):
     """Information about a specific Pokemon."""

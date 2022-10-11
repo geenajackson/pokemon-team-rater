@@ -6,8 +6,8 @@ from flask import Flask, jsonify, render_template, request, flash, redirect, ses
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
 
-from forms import UserSignUpForm, LoginForm, TeamForm, edit_team_form, CommentForm, edit_comment_form
-from models import db, connect_db, User, Team, Pokemon, Comment
+from forms import UserSignUpForm, LoginForm, TeamForm, edit_team_form, CommentForm, edit_comment_form, RatingForm
+from models import Rating, db, connect_db, User, Team, Pokemon, Comment
 
 CURR_USER_KEY = "curr_user"
 
@@ -246,8 +246,9 @@ def show_team(team_id):
     
     team = Team.query.get_or_404(team_id)
     user = User.query.get(team.user_id)
-    comments = Comment.query.filter_by(team_id=team_id)
+    comments = Comment.query.filter_by(team_id=team_id).order_by(Comment.id)
     form = CommentForm()
+    rating_form = RatingForm()
 
     if form.validate_on_submit():
         comment = Comment(
@@ -263,7 +264,7 @@ def show_team(team_id):
         return redirect(f"/teams/{team_id}/show")
 
 
-    return render_template("/team/show.html", team=team, user=user, form=form, comments=comments)
+    return render_template("/team/show.html", team=team, user=user, form=form, rating_form=rating_form, comments=comments)
 
     
 
@@ -322,7 +323,7 @@ def delete_team(team_id):
 ##################################################################################
 # Comment edit and delete routes
 
-@app.route("/comments/<int:comment_id>/edit")
+@app.route("/comments/<int:comment_id>/edit", methods=["GET", "POST"])
 def edit_comment(comment_id):
     """Edits a comment."""
 
@@ -340,9 +341,9 @@ def edit_comment(comment_id):
     form = edit_comment_form(comment)
 
     if form.validate_on_submit():
-        comment = form.comment.data
+        new_comment = form.comment.data
 
-        comment.comment = comment
+        comment.comment = new_comment
         
         db.session.add(comment)
         db.session.commit()
@@ -352,3 +353,26 @@ def edit_comment(comment_id):
         return redirect(f"/teams/{team.id}/show")
     
     return render_template("/team/comment-edit.html", form=form, comment=comment, team=team)
+
+@app.route("/comments/<int:comment_id>/delete", methods=["POST"])
+def delete_comment(comment_id):
+    """Deletes a comment."""
+
+    if not g.user:
+        flash("Log in to view this page!", "warning")
+        return redirect("/")
+
+    comment = Comment.query.get_or_404(comment_id)
+    team = Team.query.get_or_404(comment.team_id)
+
+    if comment.commenter_id != g.user.id:
+        flash("Access unauthorized.", "warning")
+        return redirect("/")
+
+    db.session.delete(comment)
+    db.session.commit()
+    flash("Comment deleted.", "danger")
+
+    return redirect(f"/teams/{team.id}/show")
+
+##################################################################################

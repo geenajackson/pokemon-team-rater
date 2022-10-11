@@ -34,3 +34,11 @@ def edit_team_form(team):
         details = TextAreaField("Details", default=team.details, validators=[DataRequired()])
     
     return EditTeamForm()
+
+def edit_comment_form(com):
+    """Function for editing a comment"""
+    class EditCommentForm(FlaskForm):
+        """Form for editing a comment"""
+        comment = TextAreaField("Comment", default=com.comment, validators=[DataRequired()])
+    
+    return EditCommentForm()

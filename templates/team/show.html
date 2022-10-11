@@ -5,6 +5,37 @@
 {% block content %}
 
 <div class="container">
+    <div>
+        <form id="rating-form" method="POST">
+            {{ rating_form.hidden_tag() }}
+            <!--add type=hidden form fields -->
+
+            {% for field in rating_form
+            if field.widget.input_type != 'hidden' %}
+
+            <p>
+                {{ field.label }}
+
+                {% for subfield in field %}
+                <tr>
+                    <td>{{ subfield }}</td>
+                    <td>{% for i in range(subfield.label.text |int)%}
+                        <i class="fa-solid fa-star"></i>
+                        {% endfor %}
+                    </td>
+                </tr>
+                {% endfor %}
+
+                {% for error in field.errors %}
+                <span class="form-text text-danger">{{ error }}</span>
+                {% endfor %}
+            </p>
+
+            {% endfor %}
+
+            <button class="btn btn-primary" type="submit">Rate!</button>
+        </form>
+    </div>
     <ul class="list-group">
         <li class="list-group-item">
             <a href="/teams/{{ team.id }}">
@@ -23,6 +54,7 @@
     <a href="/teams/{{team.id}}/edit" class="btn btn-secondary">Edit</a>
     {% endif %}
     <ul class="list-group">
+        <h4>Comments</h4>
         {% for comment in comments %}
         <li class="list-group-item">
             <div class="message-area">
@@ -30,6 +62,12 @@
                 <span class="text-muted">- <a href="/users/{{ comment.commenter_id }}">{{
                         comment.commenter.username}}</a></span>
             </div>
+            {% if comment.commenter_id == g.user.id %}
+            <a href="/comments/{{comment.id}}/edit" class="btn btn-outline-success btn-sm"> Edit</a>
+            <form action="/comments/{{comment.id}}/delete" method="POST">
+                <button class="btn btn-outline-danger btn-sm"><i class="fa-regular fa-trash-can"></i> Delete</button>
+            </form>
+            {% endif %}
         </li>
         {% endfor %}
     </ul>

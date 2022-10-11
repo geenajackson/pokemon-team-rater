@@ -25,11 +25,12 @@
 
         {% endfor %}
 
-        <button class="btn btn-primary" type="submit">Update</button>
+        <button class="btn btn-success" type="submit">Update</button>
     </form>
     <form action="/comments/{{comment.id}}/delete" method="POST">
         <button class="btn btn-danger"><i class="fa-regular fa-trash-can"></i> Delete</button>
-        <a href="/teams/{{team.id}}/show" class="btn btn-secondary">Cancel</a>
+    </form>
+    <a href="/teams/{{team.id}}/show" class="btn btn-secondary">Cancel</a>
 </div>
 
 {% endblock %}

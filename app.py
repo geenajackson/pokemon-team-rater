@@ -6,8 +6,8 @@ from flask import Flask, jsonify, render_template, request, flash, redirect, ses
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
 
-from forms import UserSignUpForm, LoginForm, TeamForm, edit_team_form
-from models import db, connect_db, User, Team, Pokemon
+from forms import UserSignUpForm, LoginForm, TeamForm, edit_team_form, CommentForm, edit_comment_form
+from models import db, connect_db, User, Team, Pokemon, Comment
 
 CURR_USER_KEY = "curr_user"
 
@@ -236,7 +236,7 @@ def add_pokemon(team_id):
 
         return redirect(f"/teams/{team.id}/show")
 
-@app.route("/teams/<int:team_id>/show")
+@app.route("/teams/<int:team_id>/show", methods=["GET", "POST"])
 def show_team(team_id):
     """Shows one team's details, comments, and ratings."""
 
@@ -246,8 +246,24 @@ def show_team(team_id):
     
     team = Team.query.get_or_404(team_id)
     user = User.query.get(team.user_id)
+    comments = Comment.query.filter_by(team_id=team_id)
+    form = CommentForm()
 
-    return render_template("/team/show.html", team=team, user=user)
+    if form.validate_on_submit():
+        comment = Comment(
+            team_id=team_id,
+            comment=form.comment.data,
+            commenter_id=g.user.id)
+
+        db.session.add(comment)
+        db.session.commit()
+
+
+        flash("Comment added!", "success")
+        return redirect(f"/teams/{team_id}/show")
+
+
+    return render_template("/team/show.html", team=team, user=user, form=form, comments=comments)
 
     
 
@@ -302,3 +318,37 @@ def delete_team(team_id):
     flash("Team deleted.", "danger")
 
     return redirect(f"/users/{g.user.id}")
+
+##################################################################################
+# Comment edit and delete routes
+
+@app.route("/comments/<int:comment_id>/edit")
+def edit_comment(comment_id):
+    """Edits a comment."""
+
+    if not g.user:
+        flash("Log in to view this page!", "warning")
+        return redirect("/")
+
+    comment = Comment.query.get_or_404(comment_id)
+    team = Team.query.get_or_404(comment.team_id)
+
+    if comment.commenter_id != g.user.id:
+        flash("Access unauthorized.", "warning")
+        return redirect("/")
+    
+    form = edit_comment_form(comment)
+
+    if form.validate_on_submit():
+        comment = form.comment.data
+
+        comment.comment = comment
+        
+        db.session.add(comment)
+        db.session.commit()
+
+        flash("Team updated.", "success")
+
+        return redirect(f"/teams/{team.id}/show")
+    
+    return render_template("/team/comment-edit.html", form=form, comment=comment, team=team)

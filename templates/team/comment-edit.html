@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Comment{% endblock %}
+
+{% block content %}
+
+<div class="container">
+    <h1 class="display-2">Edit Comment</h1>
+
+    <form id="edit-comment-form" method="POST">
+        {{ form.hidden_tag() }}
+        <!--add type=hidden form fields -->
+
+        {% for field in form
+        if field.widget.input_type != 'hidden' %}
+
+        <p>
+            {{ field.label }}
+            {{ field(class_="form-control") }}
+
+            {% for error in field.errors %}
+            <span class="form-text text-danger">{{ error }}</span>
+            {% endfor %}
+        </p>
+
+        {% endfor %}
+
+        <button class="btn btn-primary" type="submit">Update</button>
+    </form>
+    <form action="/comments/{{comment.id}}/delete" method="POST">
+        <button class="btn btn-danger"><i class="fa-regular fa-trash-can"></i> Delete</button>
+        <a href="/teams/{{team.id}}/show" class="btn btn-secondary">Cancel</a>
+</div>
+
+{% endblock %}

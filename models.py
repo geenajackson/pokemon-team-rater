@@ -19,6 +19,7 @@ class User(db.Model):
     password = db.Column(db.Text, nullable=False)
     
     teams = db.relationship("Team", backref="user")
+    comments = db.relationship("Comment", backref="commenter")
 
     @classmethod
     def signup(cls, email, username, password):
@@ -58,6 +59,8 @@ class Team(db.Model):
     'Pokemon',
     secondary="team_members"
     )
+
+    comments = db.relationship("Comment")
 
 
 class Pokemon(db.Model):

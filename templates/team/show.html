@@ -22,6 +22,37 @@
     {% if team.user_id == g.user.id %}
     <a href="/teams/{{team.id}}/edit" class="btn btn-secondary">Edit</a>
     {% endif %}
+    <ul class="list-group">
+        {% for comment in comments %}
+        <li class="list-group-item">
+            <div class="message-area">
+                <p>{{ comment.comment }}</p>
+                <span class="text-muted">- <a href="/users/{{ comment.commenter_id }}">{{
+                        comment.commenter.username}}</a></span>
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+    <form id="comment-form" method="POST">
+        {{ form.hidden_tag() }}
+        <!--add type=hidden form fields -->
+
+        {% for field in form
+        if field.widget.input_type != 'hidden' %}
+
+        <p>
+            {{ field.label }}
+            {{ field(class_="form-control") }}
+
+            {% for error in field.errors %}
+            <span class="form-text text-danger">{{ error }}</span>
+            {% endfor %}
+        </p>
+
+        {% endfor %}
+
+        <button class="btn btn-primary" type="submit">Add Comment</button>
+    </form>
 </div>
 
 {% endblock %}

@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, TextAreaField
+from wtforms import StringField, PasswordField, TextAreaField, RadioField
 from wtforms.validators import DataRequired, Email, Length
 
 class UserSignUpForm(FlaskForm):
@@ -25,6 +25,10 @@ class CommentForm(FlaskForm):
     """Form for adding a comment."""
 
     comment = TextAreaField("Comment", validators=[DataRequired()])
+
+class RatingForm(FlaskForm):
+    """Form for rating a team."""
+    rating = RadioField("Rate this Team:", choices=[1, 2, 3, 4, 5], validators=[DataRequired()])
 
 def edit_team_form(team):
     """Function for editing a team"""

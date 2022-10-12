@@ -1,10 +1,12 @@
 const BASE_URL = "https://pokeapi.co/api/v2"
 const $pokemonSearch = $("#pokemon-search")
-const $term = $("#term")
+const $term = $("#autocomplete")
 const $pokemonDisplay = $("#pokemon-display")
+const $rateArea = $("#rate-area")
+const $pathname = window.location.pathname
+
 
 async function getPokemon(term) {
-    console.log("called")
     try {
         const response = await axios({
             url: `${BASE_URL}/pokemon/${term}`,
@@ -43,6 +45,25 @@ async function getAndShowPokemon(term) {
         $pokemonDisplay.show()
     }
 }
+
+async function handleRating(rating) {
+    try {
+        await axios({
+            url: $pathname + `/rating/${rating}/submit`,
+            method: "POST"
+        });
+    }
+    catch (error) {
+        return undefined;
+    }
+}
+
+$("input[type='radio']").click(function (evt) {
+    evt.preventDefault();
+    const rating = $("input[name='crating']:checked").val();
+    handleRating(rating)
+    location.reload()
+})
 
 $pokemonSearch.on("submit", function (evt) {
     evt.preventDefault();

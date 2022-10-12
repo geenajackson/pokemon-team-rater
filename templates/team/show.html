@@ -6,35 +6,18 @@
 
 <div class="container">
     <div>
-        <form id="rating-form" method="POST">
-            {{ rating_form.hidden_tag() }}
-            <!--add type=hidden form fields -->
-
-            {% for field in rating_form
-            if field.widget.input_type != 'hidden' %}
-
-            <p>
-                {{ field.label }}
-
-                {% for subfield in field %}
-                <tr>
-                    <td>{{ subfield }}</td>
-                    <td>{% for i in range(subfield.label.text |int)%}
-                        <i class="fa-solid fa-star"></i>
-                        {% endfor %}
-                    </td>
-                </tr>
-                {% endfor %}
-
-                {% for error in field.errors %}
-                <span class="form-text text-danger">{{ error }}</span>
-                {% endfor %}
-            </p>
-
-            {% endfor %}
-
-            <button class="btn btn-primary" type="submit">Rate!</button>
-        </form>
+        <ul id="rate-area" class="rate-area">
+            <input type="radio" id="5-star" name="crating" value="5">
+            <label for="5-star" title="Amazing">5 stars</label>
+            <input type="radio" id="4-star" name="crating" value="4">
+            <label for="4-star" title="Good">4 stars</label>
+            <input type="radio" id="3-star" name="crating" value="3">
+            <label for="3-star" title="Average">3 stars</label>
+            <input type="radio" id="2-star" name="crating" value="2">
+            <label for="2-star" title="Not Good">2 stars</label>
+            <input type="radio" id="1-star" required="" name="crating" value="1" aria-required="true">
+            <label for="1-star" title="Bad">1 star</label>
+        </ul>
     </div>
     <ul class="list-group">
         <li class="list-group-item">

@@ -376,3 +376,36 @@ def delete_comment(comment_id):
     return redirect(f"/teams/{team.id}/show")
 
 ##################################################################################
+# Rating routes
+
+@app.route("/teams/<int:team_id>/show/rating/<int:rating>/submit", methods=["POST"])
+def submit_rating(team_id, rating):
+
+    if not g.user:
+        flash("Log in to view this page!", "warning")
+        return redirect("/")
+
+    team = Team.query.get_or_404(team_id)
+
+    if team.user_id == g.user.id:
+        flash("Please allow others to rate your team!", "warning")
+        return redirect(f"/teams/{team.id}/show")
+    
+    search_rating = Rating.query.filter_by(team_id=team_id, rater_id=g.user.id).first()
+
+    if search_rating:
+        search_rating.rating = rating
+
+        db.session.add(search_rating)
+        db.session.commit()
+
+        flash("Rating updated!", "success")
+        return redirect(f"/teams/{team.id}/show")
+    
+    new_rating = Rating(team_id=team_id, rating=rating, rater_id=g.user.id)
+
+    db.session.add(new_rating)
+    db.session.commit()
+
+    flash("Thank you for rating!", "success")
+    return redirect(f"/teams/{team.id}/show")

@@ -27,6 +27,19 @@
 
         <button class="btn btn-primary" type="submit">Update</button>
     </form>
+    {% if team.members %}
+    <form id="pokemon-display" action="/teams/{{team.id}}/remove" method="POST">
+        <h2>Current Pokemon: </h2>
+        {% for member in team.members %}
+        <div>
+            <input type="radio" id="{{member.name}}" name="pokemon" value="{{loop.index - 1}}">
+            <label for="{{member.name}}"><img src="{{member.image}}">{{member.name.capitalize()}}</label>
+        </div>
+        {% endfor %}
+        <button class="btn btn-secondary" type="submit">Remove Pokemon</button>
+    </form>
+    {% endif %}
+
     <a href="/teams/{{team.id}}/search" class="btn btn-success">Add Pokemon!</a>
     <form action="/teams/{{team.id}}/delete" method="POST">
         <button class="btn btn-danger"><i class="fa-regular fa-trash-can"></i> Delete</button>

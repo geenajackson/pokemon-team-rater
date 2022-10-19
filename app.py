@@ -1,10 +1,10 @@
 import os
-from re import T
 import requests
 
-from flask import Flask, jsonify, render_template, request, flash, redirect, session, g
+from flask import Flask, Response, render_template, request, flash, redirect, session, g
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.sql import func
 
 from forms import UserSignUpForm, LoginForm, TeamForm, edit_team_form, CommentForm, edit_comment_form, RatingForm
 from models import Rating, db, connect_db, User, Team, Pokemon, Comment
@@ -236,6 +236,30 @@ def add_pokemon(team_id):
 
         return redirect(f"/teams/{team.id}/show")
 
+@app.route("/teams/<int:team_id>/remove", methods=["POST"])
+def remove_pokemon(team_id):
+    """Removes a pokemon from a team."""
+
+    if not g.user:
+        flash("Log in to view this page!", "warning")
+        return redirect("/")
+
+    team = Team.query.get_or_404(team_id)
+
+    if team.user_id != g.user.id:
+        flash("Access unauthorized.", "warning")
+        return redirect("/")
+    
+    pokemon = int(request.form["pokemon"])
+
+    removed_pokemon = team.members[pokemon]
+
+    db.session.delete(removed_pokemon)
+    db.session.commit()
+
+    flash("Pokemon removed.", "warning")
+    return redirect(f"/teams/{team_id}/edit")
+
 @app.route("/teams/<int:team_id>/show", methods=["GET", "POST"])
 def show_team(team_id):
     """Shows one team's details, comments, and ratings."""
@@ -247,6 +271,16 @@ def show_team(team_id):
     team = Team.query.get_or_404(team_id)
     user = User.query.get(team.user_id)
     comments = Comment.query.filter_by(team_id=team_id).order_by(Comment.id)
+    try:
+        team_rating = round(
+            Rating
+            .query
+            .with_entities(func.avg(Rating.rating).label("average"))
+            .filter_by(team_id=team_id)
+            .scalar(), 2)
+    except:
+        team_rating = "N/A"
+
     form = CommentForm()
     rating_form = RatingForm()
 
@@ -264,7 +298,7 @@ def show_team(team_id):
         return redirect(f"/teams/{team_id}/show")
 
 
-    return render_template("/team/show.html", team=team, user=user, form=form, rating_form=rating_form, comments=comments)
+    return render_template("/team/show.html", team=team, user=user, form=form, rating_form=rating_form, comments=comments, team_rating=team_rating)
 
     
 
@@ -283,6 +317,7 @@ def edit_team(team_id):
         return redirect("/")
 
     form = edit_team_form(team)
+    
 
     if form.validate_on_submit():
         name = form.name.data
@@ -388,8 +423,7 @@ def submit_rating(team_id, rating):
     team = Team.query.get_or_404(team_id)
 
     if team.user_id == g.user.id:
-        flash("Please allow others to rate your team!", "warning")
-        return redirect(f"/teams/{team.id}/show")
+        return "warning"
     
     search_rating = Rating.query.filter_by(team_id=team_id, rater_id=g.user.id).first()
 
@@ -399,13 +433,11 @@ def submit_rating(team_id, rating):
         db.session.add(search_rating)
         db.session.commit()
 
-        flash("Rating updated!", "success")
-        return redirect(f"/teams/{team.id}/show")
+        return "update"
     
     new_rating = Rating(team_id=team_id, rating=rating, rater_id=g.user.id)
 
     db.session.add(new_rating)
     db.session.commit()
 
-    flash("Thank you for rating!", "success")
-    return redirect(f"/teams/{team.id}/show")
+    return "success"

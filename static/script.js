@@ -3,7 +3,9 @@ const $pokemonSearch = $("#pokemon-search")
 const $term = $("#autocomplete")
 const $pokemonDisplay = $("#pokemon-display")
 const $rateArea = $("#rate-area")
+const $flashMsg = $("#flash-msg")
 const $pathname = window.location.pathname
+
 
 
 async function getPokemon(term) {
@@ -48,21 +50,46 @@ async function getAndShowPokemon(term) {
 
 async function handleRating(rating) {
     try {
-        await axios({
+        const response = await axios({
             url: $pathname + `/rating/${rating}/submit`,
             method: "POST"
         });
+        console.log(response.data);
+        return response.data;
     }
     catch (error) {
         return undefined;
     }
 }
 
-$("input[type='radio']").click(function (evt) {
+async function addRating(rating) {
+    const response = await handleRating(rating)
+    if (response == "success") {
+        $flashMsg.empty()
+        $flashMsg.append($(`<div class="alert alert-success">Thank you for rating!</div>`))
+        $flashMsg.show()
+    }
+    else if (response == "update") {
+        $flashMsg.empty()
+        $flashMsg.append($(`<div class="alert alert-success">Rating updated!</div>`))
+        $flashMsg.show()
+    }
+    else if (response == "warning") {
+        $flashMsg.empty()
+        $flashMsg.append($(`<div class="alert alert-warning">Please allow others to rate your team!</div>`))
+        $flashMsg.show()
+    }
+    else {
+        $flashMsg.empty()
+        $flashMsg.append($(`<div class="alert alert-danger">Error submitting rating.</div>`))
+        $flashMsg.show()
+    }
+}
+// $("input[type='radio']").click(function (evt) {
+$("#rate-area > input[type='radio']").click(function (evt) {
     evt.preventDefault();
     const rating = $("input[name='crating']:checked").val();
-    handleRating(rating)
-    location.reload()
+    addRating(rating);
 })
 
 $pokemonSearch.on("submit", function (evt) {

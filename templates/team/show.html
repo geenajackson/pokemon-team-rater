@@ -4,8 +4,10 @@
 
 {% block content %}
 
+
 <div class="container">
     <div>
+        <p>Current Rating: {{team_rating}}</p>
         <ul id="rate-area" class="rate-area">
             <input type="radio" id="5-star" name="crating" value="5">
             <label for="5-star" title="Amazing">5 stars</label>
@@ -34,7 +36,7 @@
         </li>
     </ul>
     {% if team.user_id == g.user.id %}
-    <a href="/teams/{{team.id}}/edit" class="btn btn-secondary">Edit</a>
+    <a href="/teams/{{team.id}}/edit" class="btn btn-success">Edit/Add Pokemon</a>
     {% endif %}
     <ul class="list-group">
         <h4>Comments</h4>

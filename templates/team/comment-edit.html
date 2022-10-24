@@ -24,13 +24,20 @@
         </p>
 
         {% endfor %}
-
-        <button class="btn btn-success" type="submit">Update</button>
+        <div class="row row-cols-auto pt-1">
+            <div class="col">
+                <button class="btn btn-success" type="submit">Update</button>
+            </div>
     </form>
-    <form action="/comments/{{comment.id}}/delete" method="POST">
-        <button class="btn btn-danger"><i class="fa-regular fa-trash-can"></i> Delete</button>
-    </form>
-    <a href="/teams/{{team.id}}/show" class="btn btn-secondary">Cancel</a>
+    <div class="col">
+        <form action="/comments/{{comment.id}}/delete" method="POST">
+            <button class="btn btn-danger"><i class="fa-regular fa-trash-can"></i> Delete</button>
+        </form>
+    </div>
+    <div class="col">
+        <a href="/teams/{{team.id}}/show" class="btn btn-secondary">Cancel</a>
+    </div>
+</div>
 </div>
 
 {% endblock %}

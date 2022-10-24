@@ -1,3 +1,9 @@
+/* Gradient created with https://cssgradient.io/ */
+body {
+    background: rgb(204, 0, 0);
+    background: linear-gradient(90deg, rgba(204, 0, 0, 0.6) 0%, rgba(255, 222, 0, 0.6) 50%, rgba(59, 76, 202, 0.6) 100%);
+}
+
 .container {
     display: flex;
     flex-direction: column;
@@ -132,7 +138,7 @@
     cursor: pointer;
     font-size: 40px;
     line-height: 32px;
-    color: lightgrey;
+    color: #808080;
     margin-bottom: 10px !important;
 }
 
@@ -143,13 +149,13 @@
 }
 
 .rate-area>input:checked~label {
-    color: #e8262d;
+    color: #FFDE00;
     text-shadow: none;
 }
 
 .rate-area:not(:checked)>label:hover,
 .rate-area:not(:checked)>label:hover~label {
-    color: #e8262d;
+    color: #FFDE00;
 
 }
 
@@ -158,7 +164,7 @@
 .rate-area>input:checked~label:hover,
 .rate-area>input:checked~label:hover~label,
 .rate-area>label:hover~input:checked~label {
-    color: #e8262d;
+    color: #FFDE00;
     text-shadow: none;
 
 }

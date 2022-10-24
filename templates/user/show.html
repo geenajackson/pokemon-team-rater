@@ -13,14 +13,14 @@
             <a href="/teams/{{ team.id }}">
                 <div class="message-area">
 
-                    <a href="/teams/{{ team.id }}/show">{{ team.name }}</a>
+                    <a class="display-6" href="/teams/{{ team.id }}/show">{{ team.name }}</a><br>
                     {% for member in team.members %}
-                    <img src="{{member.image}}">{{member.name}}</img>
+                    <img src="{{member.image}}" alt="{{member.name}}"></img>
                     {% endfor %}
                     <p>{{ team.details }}</p>
-                    <span class="text-muted">by <a href="/users/{{ user.id }}">{{ user.username }}</a></span>
+                    <span class="text-muted">by <a href="/users/{{ team.user_id }}">{{ team.user.username }}</a></span>
                 </div>
-        </li>
+        </li><br>
 
         {% endfor %}
 

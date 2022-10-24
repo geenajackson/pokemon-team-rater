@@ -24,7 +24,7 @@ class TeamForm(FlaskForm):
 class CommentForm(FlaskForm):
     """Form for adding a comment."""
 
-    comment = TextAreaField("Comment", validators=[DataRequired()])
+    comment = StringField("Comment", validators=[DataRequired()])
 
 class RatingForm(FlaskForm):
     """Form for rating a team."""

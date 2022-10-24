@@ -21,7 +21,7 @@
             <label for="1-star" title="Bad">1 star</label>
         </ul>
     </div>
-    <ul class="list-group">
+    <ul class="list-group pb-2">
         <li class="list-group-item">
             <a href="/teams/{{ team.id }}">
                 <div class="message-area">
@@ -45,8 +45,8 @@
     <a href="/teams/{{team.id}}/edit" class="btn btn-success w-50 mx-auto">Edit/Add Pokemon</a>
     {% endif %}
     <br>
+    <h4>Comments</h4>
     <ul class="list-group">
-        <h4>Comments</h4>
         {% for comment in comments %}
         <li class="list-group-item">
             <div class="message-area">
@@ -55,17 +55,21 @@
                         comment.commenter.username}}</a></span>
             </div>
             {% if comment.commenter_id == g.user.id %}
-            <div>
-                <a href="/comments/{{comment.id}}/edit" class="btn btn-outline-success btn-sm"> Edit</a>
-                <form action="/comments/{{comment.id}}/delete" method="POST">
-                    <button class="btn btn-outline-danger btn-sm"><i class="fa-regular fa-trash-can"></i>
-                        Delete</button>
-                </form>
+
+            <div class="row row-cols-auto pt-1 justify-content-end">
+                <div class="col"><a href="/comments/{{comment.id}}/edit" class="btn btn-outline-success btn-sm">
+                        <i class="fa-regular fa-pen-to-square"></i>Edit</a></div>
+                <div class="col">
+                    <form action="/comments/{{comment.id}}/delete" method="POST">
+                        <button class="btn btn-outline-danger btn-sm"><i class="fa-regular fa-trash-can"></i>
+                            Delete</button>
+                    </form>
+                </div>
             </div>
             {% endif %}
         </li>
         {% endfor %}
-    </ul>
+    </ul><br>
     <form id="comment-form" method="POST">
         {{ form.hidden_tag() }}
         <!--add type=hidden form fields -->

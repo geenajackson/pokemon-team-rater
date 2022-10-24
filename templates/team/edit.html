@@ -25,11 +25,12 @@
 
         {% endfor %}
 
-        <button class="btn btn-primary" type="submit">Update Info</button>
+        <button class="btn btn-primary" type="submit"><i class="fa-solid fa-pen-to-square"></i> Update Info</button>
     </form><br>
     <div class="row row-cols-auto pt-1">
         <div class="col">
-            <a href="/teams/{{team.id}}/search" class="btn btn-success">Add Pokemon!</a>
+            <a href="/teams/{{team.id}}/search" class="btn btn-success"><i class="fa-solid fa-plus"></i> Add
+                Pokemon!</a>
         </div>
         <div class="col">
             <form action="/teams/{{team.id}}/delete" method="POST">
@@ -37,7 +38,8 @@
             </form>
         </div>
         <div class="col">
-            <a href="/teams/{{team.id}}/show" class="btn btn-secondary">Cancel</a>
+            <a href="/teams/{{team.id}}/show" class="btn btn-secondary"><i class="fa-solid fa-rotate-left"></i>
+                Cancel</a>
         </div>
     </div><br>
     {% if team.members %}
@@ -49,7 +51,7 @@
             <label for="{{member.name}}"><img src="{{member.image}}">{{member.name.capitalize()}}</label>
         </div>
         {% endfor %}
-        <button class="btn btn-secondary" type="submit">Remove Pokemon</button>
+        <button class="btn btn-secondary" type="submit"><i class="fa-solid fa-xmark"></i> Remove Pokemon</button>
     </form><br>
     {% endif %}
 

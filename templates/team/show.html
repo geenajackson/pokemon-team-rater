@@ -42,7 +42,8 @@
         </li>
     </ul>
     {% if team.user_id == g.user.id %}
-    <a href="/teams/{{team.id}}/edit" class="btn btn-success w-50 mx-auto">Edit/Add Pokemon</a>
+    <a href="/teams/{{team.id}}/edit" class="btn btn-success w-50 mx-auto"><i class="fa-regular fa-pen-to-square"></i>
+        Edit/Add Pokemon</a>
     {% endif %}
     <br>
     <h4>Comments</h4>
@@ -88,7 +89,7 @@
 
         {% endfor %}
 
-        <button class="btn btn-primary" type="submit">Add Comment</button>
+        <button class="btn btn-primary" type="submit"><i class="fa-regular fa-comment"></i> Add Comment</button>
     </form>
 </div>
 

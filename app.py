@@ -203,7 +203,7 @@ def add_pokemon(team_id):
         team.members.append(add_pokemon)
         db.session.commit()
 
-        flash(f"Your new pokemon is: {add_pokemon.name}", "success")
+        flash(f"Added new pokemon!", "success")
 
         return redirect(f"/teams/{team.id}/show")
 
@@ -232,7 +232,7 @@ def add_pokemon(team_id):
         team.members.append(new_pokemon)
         db.session.commit()
 
-        flash(f"Your new pokemon is: {new_pokemon.name}", "success")
+        flash(f"Added new pokemon!", "success")
 
         return redirect(f"/teams/{team.id}/show")
 
@@ -250,15 +250,19 @@ def remove_pokemon(team_id):
         flash("Access unauthorized.", "warning")
         return redirect("/")
     
-    pokemon = int(request.form["pokemon"])
+    try:
+        pokemon = int(request.form["pokemon"])
 
-    removed_pokemon = team.members[pokemon]
+        removed_pokemon = team.members[pokemon]
 
-    db.session.delete(removed_pokemon)
-    db.session.commit()
+        db.session.delete(removed_pokemon)
+        db.session.commit()
 
-    flash("Pokemon removed.", "warning")
-    return redirect(f"/teams/{team_id}/edit")
+        flash("Pokemon removed.", "warning")
+        return redirect(f"/teams/{team_id}/edit")
+
+    except:
+        return redirect(f"/teams/{team_id}/edit")
 
 @app.route("/teams/<int:team_id>/show", methods=["GET", "POST"])
 def show_team(team_id):

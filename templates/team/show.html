@@ -7,7 +7,7 @@
 
 <div class="container">
     <div>
-        <p>Current Rating: {{team_rating}}</p>
+        <h3>Current Rating: {{team_rating}}</h3>
         <ul id="rate-area" class="rate-area">
             <input type="radio" id="5-star" name="crating" value="5">
             <label for="5-star" title="Amazing">5 stars</label>
@@ -26,18 +26,25 @@
             <a href="/teams/{{ team.id }}">
                 <div class="message-area">
 
-                    <a href="/teams/{{ team.id }}/show">{{ team.name }}</a>
-                    {% for member in team.members %}
-                    <img src="{{member.image}}">{{member.name}}</img>
-                    {% endfor %}
+                    <a class="display-6" href="/teams/{{ team.id }}/show">{{ team.name }}</a><br>
+                    <div class="row gx-1">
+                        {% for member in team.members %}
+                        <div class="hoverwrap">
+                            <img src="{{member.image}}" alt="{{member.name}}"></img>
+                            <div class="hovercap">{{member.name.capitalize()}}</div>
+                        </div>
+                        {% endfor %}
+                    </div>
                     <p>{{ team.details }}</p>
+
                     <span class="text-muted">by <a href="/users/{{ user.id }}">{{ user.username }}</a></span>
                 </div>
         </li>
     </ul>
     {% if team.user_id == g.user.id %}
-    <a href="/teams/{{team.id}}/edit" class="btn btn-success">Edit/Add Pokemon</a>
+    <a href="/teams/{{team.id}}/edit" class="btn btn-success w-50 mx-auto">Edit/Add Pokemon</a>
     {% endif %}
+    <br>
     <ul class="list-group">
         <h4>Comments</h4>
         {% for comment in comments %}
@@ -48,10 +55,13 @@
                         comment.commenter.username}}</a></span>
             </div>
             {% if comment.commenter_id == g.user.id %}
-            <a href="/comments/{{comment.id}}/edit" class="btn btn-outline-success btn-sm"> Edit</a>
-            <form action="/comments/{{comment.id}}/delete" method="POST">
-                <button class="btn btn-outline-danger btn-sm"><i class="fa-regular fa-trash-can"></i> Delete</button>
-            </form>
+            <div>
+                <a href="/comments/{{comment.id}}/edit" class="btn btn-outline-success btn-sm"> Edit</a>
+                <form action="/comments/{{comment.id}}/delete" method="POST">
+                    <button class="btn btn-outline-danger btn-sm"><i class="fa-regular fa-trash-can"></i>
+                        Delete</button>
+                </form>
+            </div>
             {% endif %}
         </li>
         {% endfor %}

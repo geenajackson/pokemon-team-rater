@@ -25,8 +25,21 @@
 
         {% endfor %}
 
-        <button class="btn btn-primary" type="submit">Update</button>
-    </form>
+        <button class="btn btn-primary" type="submit">Update Info</button>
+    </form><br>
+    <div class="row row-cols-auto pt-1">
+        <div class="col">
+            <a href="/teams/{{team.id}}/search" class="btn btn-success">Add Pokemon!</a>
+        </div>
+        <div class="col">
+            <form action="/teams/{{team.id}}/delete" method="POST">
+                <button class="btn btn-danger"><i class="fa-regular fa-trash-can"></i> Delete Team</button>
+            </form>
+        </div>
+        <div class="col">
+            <a href="/teams/{{team.id}}/show" class="btn btn-secondary">Cancel</a>
+        </div>
+    </div><br>
     {% if team.members %}
     <form id="pokemon-display" action="/teams/{{team.id}}/remove" method="POST">
         <h2>Current Pokemon: </h2>
@@ -37,13 +50,9 @@
         </div>
         {% endfor %}
         <button class="btn btn-secondary" type="submit">Remove Pokemon</button>
-    </form>
+    </form><br>
     {% endif %}
 
-    <a href="/teams/{{team.id}}/search" class="btn btn-success">Add Pokemon!</a>
-    <form action="/teams/{{team.id}}/delete" method="POST">
-        <button class="btn btn-danger"><i class="fa-regular fa-trash-can"></i> Delete</button>
-        <a href="/teams/{{team.id}}/show" class="btn btn-secondary">Cancel</a>
 </div>
 
 {% endblock %}

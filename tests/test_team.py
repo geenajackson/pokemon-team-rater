@@ -53,10 +53,12 @@ class TeamTestCase(TestCase):
         db.session.add(team1)
         db.session.commit()
 
+        team = Team.query.get(1111)
+
 
         self.user1 = user1
         self.user2 = user2
-        self.team1 = team1
+        self.team = team
     
     def tearDown(self):
         """Clean up fouled interactions."""
@@ -103,6 +105,7 @@ class TeamTestCase(TestCase):
             resp = c.post("/teams/1111/add", data={"pokemon": "pikachu"})
 
             team = Team.query.get(1111)
+            
 
             self.assertEqual(resp.status_code, 302)
             self.assertEqual(team.members[0].name, "pikachu")

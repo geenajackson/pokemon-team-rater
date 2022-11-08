@@ -1,7 +1,7 @@
 import os
 import requests
 
-from flask import Flask, Response, render_template, request, flash, redirect, session, g
+from flask import Flask, render_template, request, flash, redirect, session, g
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.sql import func
@@ -24,6 +24,20 @@ db.create_all()
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', "super effective secret")
 toolbar = DebugToolbarExtension(app)
+
+##################################################################################
+# Homepage and redirect to signup.
+
+@app.route("/")
+def homepage():
+    """Shows homepage if logged in. Renders signup/login choices if not."""
+
+    if g.user:
+        teams = (Team.query.order_by(Team.id.desc()).limit(100).all())
+        return render_template("home.html", teams=teams)
+    
+    else:
+        return render_template("home-anon.html")
 
 ##################################################################################
 # User related routes
@@ -121,19 +135,6 @@ def logout():
     """Logs out a user."""
     do_logout()
     return redirect("/")
-##################################################################################
-# Homepage and redirect to signup.
-
-@app.route("/")
-def homepage():
-    """Shows homepage if logged in. Renders signup/login choices if not."""
-
-    if g.user:
-        teams = (Team.query.order_by(Team.id.desc()).limit(100).all())
-        return render_template("home.html", teams=teams)
-    
-    else:
-        return render_template("home-anon.html")
 
 ##################################################################################
 # Team CRUD routes.

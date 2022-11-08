@@ -14,12 +14,11 @@ CURR_USER_KEY = "curr_user"
 app = Flask(__name__)
 
 # modifies database url to begin with postgresql
-uri = os.getenv("DATABASE_URL")
+uri = os.getenv("DATABASE_URL", "postgresql:///teamrater")
 if uri.startswith("postgres://"):
     uri = uri.replace("postgres://", "postgresql://", 1)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = (
-    os.environ.get('DATABASE_URL', 'postgresql:///teamrater'))
+app.config['SQLALCHEMY_DATABASE_URI'] = uri
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = False
 
@@ -201,46 +200,51 @@ def add_pokemon(team_id):
         flash("Access unauthorized.", "warning")
         return redirect("/")
     
-    pokemon = request.form["pokemon"]
+    try: 
+        pokemon = request.form["pokemon"]
+        add_pokemon = Pokemon.query.filter_by(name=pokemon).first()
 
-    add_pokemon = Pokemon.query.filter_by(name=pokemon).first()
+        if add_pokemon:
+            team.members.append(add_pokemon)
+            db.session.commit()
 
-    if add_pokemon:
-        team.members.append(add_pokemon)
-        db.session.commit()
+            flash(f"Added new pokemon!", "success")
 
-        flash(f"Added new pokemon!", "success")
-
-        return redirect(f"/teams/{team.id}/show")
-
-
-    else: 
-        json_pokemon = requests.get(f"https://pokeapi.co/api/v2/pokemon/{pokemon}").json()
-
-        try:
-            new_pokemon = Pokemon(
-                name=json_pokemon["name"],
-                image=json_pokemon["sprites"]["front_default"],
-                type_1=json_pokemon["types"][0]["type"]["name"],
-                type_2=json_pokemon["types"][1]["type"]["name"]
-            )
-
-        except IndexError:
-            new_pokemon = Pokemon(
-                name=json_pokemon["name"],
-                image=json_pokemon["sprites"]["front_default"],
-                type_1=json_pokemon["types"][0]["type"]["name"],
-        )       
+            return redirect(f"/teams/{team.id}/show")
 
 
+        else: 
+            json_pokemon = requests.get(f"https://pokeapi.co/api/v2/pokemon/{pokemon}").json()
 
-        db.session.add(new_pokemon)
-        team.members.append(new_pokemon)
-        db.session.commit()
+            try:
+                new_pokemon = Pokemon(
+                    name=json_pokemon["name"],
+                    image=json_pokemon["sprites"]["front_default"],
+                    type_1=json_pokemon["types"][0]["type"]["name"],
+                    type_2=json_pokemon["types"][1]["type"]["name"]
+                )
 
-        flash(f"Added new pokemon!", "success")
+            except IndexError:
+                new_pokemon = Pokemon(
+                    name=json_pokemon["name"],
+                    image=json_pokemon["sprites"]["front_default"],
+                    type_1=json_pokemon["types"][0]["type"]["name"],
+            )       
 
-        return redirect(f"/teams/{team.id}/show")
+
+
+            db.session.add(new_pokemon)
+            team.members.append(new_pokemon)
+            db.session.commit()
+
+            flash(f"Added new pokemon!", "success")
+
+            return redirect(f"/teams/{team.id}/show")
+
+    except:
+        flash("Please select a Pokemon to add!", "warning")
+        return redirect(f"/teams/{team_id}/search")
+
 
 @app.route("/teams/<int:team_id>/remove", methods=["POST"])
 def remove_pokemon(team_id):

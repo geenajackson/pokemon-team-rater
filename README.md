@@ -1,5 +1,5 @@
 # Pokemon Team Rater
-This project is deployed [at this link via Heroku](https://pokemon-team-rater.herokuapp.com/) and uses the [PokeAPI](https://pokeapi.co/) for all data involving Pokemon.
+This project is deployed [at this link via Render](https://pokemon-team-rater.onrender.com/) and uses the [PokeAPI](https://pokeapi.co/) for all data involving Pokemon.
 
 ## What is the Pokemon Team Rater?
 The Pokemon Team Rater (PTR) is designed for users to create teams of Pokemon and allow other users to rate and comment on these teams. Users will create a team of up to six Pokemon via the PokeAPI and can describe why they have chosen those specific Pokemon for their team. Other logged in users can then rate and comment on different created teams.

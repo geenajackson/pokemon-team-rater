@@ -1,22 +1,27 @@
-import os
-import requests
+#!/usr/bin/env python3
 
+# import os
+import requests
+from decouple import config
 from flask import Flask, render_template, request, flash, redirect, session, g
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.sql import func
-
 from forms import UserSignUpForm, LoginForm, TeamForm, edit_team_form, CommentForm, edit_comment_form, RatingForm
 from models import Rating, db, connect_db, User, Team, Pokemon, Comment
 
-CURR_USER_KEY = "curr_user"
-
-app = Flask(__name__)
+CURR_USER_KEY = config("POSTGRES_USER", default="postgres")
+SECRET_KEY = config("POSTGRES_PASSWORD", default="supereffectivesecret")
+POSTGRES_HOST= config("POSTGRES_HOST", default="localhost")
+POSTGRES_DB = config("POSTGRES_DB", default="teamrater")
+PORT = config("PORT", default=8000)
 
 # modifies database url to begin with postgresql
-uri = os.getenv("DATABASE_URL", "postgresql:///teamrater")
+uri = f"postgresql://{CURR_USER_KEY}:{SECRET_KEY}@{POSTGRES_HOST}:5432/{POSTGRES_DB}"
 if uri.startswith("postgres://"):
     uri = uri.replace("postgres://", "postgresql://", 1)
+
+app = Flask(__name__)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = uri
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -26,11 +31,12 @@ connect_db(app)
 db.create_all()
 
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', "super effective secret")
+app.config['SECRET_KEY'] = SECRET_KEY
 toolbar = DebugToolbarExtension(app)
 
 ##################################################################################
 # Homepage and redirect to signup.
+
 
 @app.route("/")
 def homepage():
@@ -39,12 +45,12 @@ def homepage():
     if g.user:
         teams = (Team.query.order_by(Team.id.desc()).limit(100).all())
         return render_template("home.html", teams=teams)
-    
     else:
         return render_template("home-anon.html")
 
 ##################################################################################
 # User related routes
+
 
 @app.before_request
 def add_user_to_g():
@@ -56,16 +62,19 @@ def add_user_to_g():
     else:
         g.user = None
 
+
 def do_login(user):
     """Adds user to current session."""
 
     session[CURR_USER_KEY] = user.id
+
 
 def do_logout():
     """Removes user from current session."""
 
     if CURR_USER_KEY in session:
         del session[CURR_USER_KEY]
+
 
 @app.route("/signup", methods=["GET", "POST"])
 def signup():
@@ -89,14 +98,14 @@ def signup():
         except IntegrityError:
             flash("Username/Email already taken.", "danger")
             return render_template("/user/signup.html", form=form)
-        
+
         do_login(new_user)
         flash("Created your account!", "success")
 
         return redirect("/")
-    
     else:
         return render_template("/user/signup.html", form=form)
+
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -106,20 +115,21 @@ def login():
 
     if form.validate_on_submit():
         user = User.authenticate(form.username.data, form.password.data)
-        
+
         if user:
             do_login(user)
             flash(f"Welcome, {user.username}!", "success")
             return redirect("/")
-        
+
         flash("Invalid credentials.", "danger")
-    
+
     return render_template("/user/login.html", form=form)
+
 
 @app.route("/users/<int:user_id>")
 def show_user_teams(user_id):
     """Shows teams for a specific user."""
-    
+
     if not g.user:
         flash("Log in to view this page!", "warning")
         return redirect("/")
@@ -134,6 +144,7 @@ def show_user_teams(user_id):
 
     return render_template("/user/show.html", user=user, teams=teams)
 
+
 @app.route("/logout")
 def logout():
     """Logs out a user."""
@@ -142,6 +153,7 @@ def logout():
 
 ##################################################################################
 # Team CRUD routes.
+
 
 @app.route("/teams/new", methods=["GET", "POST"])
 def new_team():
@@ -159,12 +171,12 @@ def new_team():
             details = form.details.data,
             user_id = g.user.id
         )
-        
+
         db.session.add(team)
         db.session.commit()
         flash("New team created!", "success")
         return redirect(f"/teams/{team.id}/show")
-    
+
     return render_template("/team/new-team.html", form=form)
 
 
@@ -185,7 +197,6 @@ def search_pokemon(team_id):
     return render_template("/pokemon/search.html", team=team)
 
 
-
 @app.route("/teams/<int:team_id>/add", methods=["POST"])
 def add_pokemon(team_id):
     """Adds selected Pokemon to the team."""
@@ -199,8 +210,8 @@ def add_pokemon(team_id):
     if team.user_id != g.user.id:
         flash("Access unauthorized.", "warning")
         return redirect("/")
-    
-    try: 
+
+    try:
         pokemon = request.form["pokemon"]
         add_pokemon = Pokemon.query.filter_by(name=pokemon).first()
 
@@ -211,9 +222,7 @@ def add_pokemon(team_id):
             flash(f"Added new pokemon!", "success")
 
             return redirect(f"/teams/{team.id}/show")
-
-
-        else: 
+        else:
             json_pokemon = requests.get(f"https://pokeapi.co/api/v2/pokemon/{pokemon}").json()
 
             try:
@@ -223,15 +232,12 @@ def add_pokemon(team_id):
                     type_1=json_pokemon["types"][0]["type"]["name"],
                     type_2=json_pokemon["types"][1]["type"]["name"]
                 )
-
             except IndexError:
                 new_pokemon = Pokemon(
                     name=json_pokemon["name"],
                     image=json_pokemon["sprites"]["front_default"],
                     type_1=json_pokemon["types"][0]["type"]["name"],
-            )       
-
-
+            )
 
             db.session.add(new_pokemon)
             team.members.append(new_pokemon)
@@ -240,9 +246,9 @@ def add_pokemon(team_id):
             flash(f"Added new pokemon!", "success")
 
             return redirect(f"/teams/{team.id}/show")
-
     except:
         flash("Please select a Pokemon to add!", "warning")
+
         return redirect(f"/teams/{team_id}/search")
 
 
@@ -259,7 +265,7 @@ def remove_pokemon(team_id):
     if team.user_id != g.user.id:
         flash("Access unauthorized.", "warning")
         return redirect("/")
-    
+
     try:
         pokemon = int(request.form["pokemon"])
 
@@ -270,7 +276,6 @@ def remove_pokemon(team_id):
 
         flash("Pokemon removed.", "warning")
         return redirect(f"/teams/{team_id}/edit")
-
     except:
         return redirect(f"/teams/{team_id}/edit")
 
@@ -281,7 +286,7 @@ def show_team(team_id):
     if not g.user:
         flash("Log in to view this page!", "warning")
         return redirect("/")
-    
+
     team = Team.query.get_or_404(team_id)
     user = User.query.get(team.user_id)
     comments = Comment.query.filter_by(team_id=team_id).order_by(Comment.id)
@@ -309,12 +314,11 @@ def show_team(team_id):
 
 
         flash("Comment added!", "success")
-        return redirect(f"/teams/{team_id}/show")
 
+        return redirect(f"/teams/{team_id}/show")
 
     return render_template("/team/show.html", team=team, user=user, form=form, rating_form=rating_form, comments=comments, team_rating=team_rating)
 
-    
 
 @app.route("/teams/<int:team_id>/edit", methods=["GET", "POST"])
 def edit_team(team_id):
@@ -331,7 +335,7 @@ def edit_team(team_id):
         return redirect("/")
 
     form = edit_team_form(team)
-    
+
 
     if form.validate_on_submit():
         name = form.name.data
@@ -339,15 +343,16 @@ def edit_team(team_id):
 
         team.name = name
         team.details = details
-        
+
         db.session.add(team)
         db.session.commit()
 
         flash("Team updated.", "success")
 
         return redirect(f"/teams/{team.id}/show")
-    
+
     return render_template("/team/edit.html", form=form, team=team)
+
 
 @app.route("/teams/<int:team_id>/delete", methods=["POST"])
 def delete_team(team_id):
@@ -372,6 +377,7 @@ def delete_team(team_id):
 ##################################################################################
 # Comment edit and delete routes
 
+
 @app.route("/comments/<int:comment_id>/edit", methods=["GET", "POST"])
 def edit_comment(comment_id):
     """Edits a comment."""
@@ -386,22 +392,23 @@ def edit_comment(comment_id):
     if comment.commenter_id != g.user.id:
         flash("Access unauthorized.", "warning")
         return redirect("/")
-    
+
     form = edit_comment_form(comment)
 
     if form.validate_on_submit():
         new_comment = form.comment.data
 
         comment.comment = new_comment
-        
+
         db.session.add(comment)
         db.session.commit()
 
         flash("Team updated.", "success")
 
         return redirect(f"/teams/{team.id}/show")
-    
+
     return render_template("/team/comment-edit.html", form=form, comment=comment, team=team)
+
 
 @app.route("/comments/<int:comment_id>/delete", methods=["POST"])
 def delete_comment(comment_id):
@@ -427,6 +434,7 @@ def delete_comment(comment_id):
 ##################################################################################
 # Rating routes
 
+
 @app.route("/teams/<int:team_id>/show/rating/<int:rating>/submit", methods=["POST"])
 def submit_rating(team_id, rating):
 
@@ -438,7 +446,7 @@ def submit_rating(team_id, rating):
 
     if team.user_id == g.user.id:
         return "warning"
-    
+
     search_rating = Rating.query.filter_by(team_id=team_id, rater_id=g.user.id).first()
 
     if search_rating:
@@ -448,10 +456,14 @@ def submit_rating(team_id, rating):
         db.session.commit()
 
         return "update"
-    
+
     new_rating = Rating(team_id=team_id, rating=rating, rater_id=g.user.id)
 
     db.session.add(new_rating)
     db.session.commit()
 
     return "success"
+
+
+if __name__ == "__main__":
+    app.run(debug=True, port=PORT)

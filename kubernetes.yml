@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pokemon-team-rater
+  labels:
+    app: pokemon-team-rater
+spec:
+  selector:
+    matchLabels:
+      app: pokemon-team-rater
+  template:
+    metadata:
+      labels:
+        app: pokemon-team-rater
+    spec:
+      containers:
+        - name: pokemon-team-rater
+          image: pokemon-team-rater-image
+          ports:
+            - containerPort: 8000

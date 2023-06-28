@@ -1,0 +1,53 @@
+version: '3'
+
+services:
+  web:
+    # image: python:3.10.8-alpine
+    build:
+      context: ./
+      dockerfile: Dockerfile.web
+    container_name: pokemon-team-rater-web
+    platform: linux/amd64       # linux/amd64, linux/arm64, linux/arm/v8
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - ./:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    # command: sh -c "sleep infinity"
+    # command: ["python", "app.py"]
+    command: ["gunicorn", "--conf", "/app/gunicorn.conf.py", "--bind", "0.0.0.0:${PORT}", "app:app"]
+
+  db:
+    # image: postgres
+    build:
+      context: ./
+      dockerfile: Dockerfile.db
+    container_name: pokemon-team-rater-db
+    platform: linux/amd64
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-postgres}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-mysecretpassword}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  adminer:
+    image: adminer
+    container_name: pokemon-team-rater-adminer
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8080:8080"

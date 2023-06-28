@@ -1,6 +1,9 @@
+#!/usr/bin/env python3
+
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, TextAreaField, RadioField
 from wtforms.validators import DataRequired, Email, Length
+
 
 class UserSignUpForm(FlaskForm):
     """Form for adding a new user."""
@@ -9,11 +12,13 @@ class UserSignUpForm(FlaskForm):
     username = StringField("Username", validators=[DataRequired()])
     password = PasswordField("Password", validators=[Length(min=8)])
 
+
 class LoginForm(FlaskForm):
     """Form for logging in a user."""
 
     username = StringField("Username", validators=[DataRequired()])
     password = PasswordField("Password", validators=[Length(min=8)])
+
 
 class TeamForm(FlaskForm):
     """Form for creating a new team."""
@@ -21,28 +26,35 @@ class TeamForm(FlaskForm):
     name = StringField("Name of Team:", validators=[DataRequired(), Length(max=100)])
     details = TextAreaField("About your team:", default="N/A")
 
+
 class CommentForm(FlaskForm):
     """Form for adding a comment."""
 
     comment = StringField("Comment", validators=[DataRequired()])
 
+
 class RatingForm(FlaskForm):
     """Form for rating a team."""
+
     rating = RadioField("Rate this Team:", choices=[1, 2, 3, 4, 5], validators=[DataRequired()])
+
 
 def edit_team_form(team):
     """Function for editing a team"""
+
     class EditTeamForm(FlaskForm):
         """Form for editing a team."""
         name = StringField("Team Name", default=team.name, validators=[DataRequired(), Length(max=100)])
         details = TextAreaField("Details", default=team.details, validators=[DataRequired()])
-    
+
     return EditTeamForm()
+
 
 def edit_comment_form(com):
     """Function for editing a comment"""
+
     class EditCommentForm(FlaskForm):
         """Form for editing a comment"""
         comment = TextAreaField("Comment", default=com.comment, validators=[DataRequired()])
-    
+
     return EditCommentForm()
